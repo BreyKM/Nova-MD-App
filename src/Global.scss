@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-black;
+    @apply font-jost;
+  }
+
+  h1 {
+    @apply text-3xl;
+  }
+}

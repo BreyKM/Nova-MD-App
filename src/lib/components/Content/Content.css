@@ -1,0 +1,28 @@
+#content-container {
+    height: 100vh;
+}
+
+.milkdown, .editor{
+    margin: 2rem;
+    overflow: hidden;
+}
+
+.editor {
+    color: #F9F6EE;
+    font-size: 1rem;    
+}
+
+.milkdown, .editor{
+    height: inherit;
+    border: none;
+}
+
+
+
+.ProseMirror:focus-visible {
+    outline: none;
+}
+
+.ProseMirror:focus {
+    border: 2px solid rgba(25, 25, 25, 0.5);
+}

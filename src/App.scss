@@ -1,0 +1,47 @@
+.splitpanes.my-theme {
+  .splitpanes__pane {
+    background-color: inherit;
+  }
+
+  .splitpanes__splitter {
+    background-color: inherit;
+    position: relative;
+    border: 1px solid #fafafa ;
+
+    &:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      transition: opacity 0.4s;
+      background-color: rgba(25, 25, 25, 0.3);
+      opacity: 0;
+      z-index: 1;
+    }
+
+    &:hover:before {
+      opacity: 1;
+    }
+
+    &.splitpanes__splitter__active {
+      z-index: 2;
+      /* Fix an issue of overlap fighting with a near hovered splitter */
+    }
+  }
+}
+
+.my-theme {
+  &.splitpanes--vertical > .splitpanes__splitter:before {
+    left: -15px;
+    right: -15px;
+    height: 100%;
+    cursor: col-resize;
+  }
+
+  &.splitpanes--horizontal > .splitpanes__splitter:before {
+    top: -15px;
+    bottom: -15px;
+    width: 100%;
+    cursor: row-resize;
+  }
+}

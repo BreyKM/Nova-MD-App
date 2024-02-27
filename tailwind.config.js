@@ -6,7 +6,16 @@ export default {
         "./electron/**/*.{html,svelte,js,ts,}"
     ],
     theme: {
-        extend: {},
+        colors: {
+            'black': '#2B2B2B'
+        },
+        extend: {
+            fontFamily: {
+                jost: ['Jost', "sans-serif"]
+            }
+        },
     },
-    plugins: [],
+    plugins: [
+        require('@tailwindcss/typography'),
+    ],
 }

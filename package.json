@@ -1,6 +1,6 @@
 {
-  "name": "vite-svelte-electron-tailwind",
-  "description": "Vite + Svelte + Electron + Tailwind",
+  "name": "nova",
+  "description": "Nova is a simple, but efficient note taking app",
   "license": "MIT",
   "private": true,
   "version": "0.0.0",
@@ -16,23 +16,38 @@
     "make": "npm run build && electron-forge make"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.1.1",
-    "@electron-forge/maker-deb": "^6.1.1",
-    "@electron-forge/maker-rpm": "^6.1.1",
-    "@electron-forge/maker-squirrel": "^6.1.1",
-    "@electron-forge/maker-zip": "^6.1.1",
+    "@electron-forge/cli": "^7.3.0",
+    "@electron-forge/maker-deb": "^7.3.0",
+    "@electron-forge/maker-rpm": "^7.3.0",
+    "@electron-forge/maker-squirrel": "^7.3.0",
+    "@electron-forge/maker-zip": "^7.3.0",
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
     "autoprefixer": "^10.4.14",
-    "concurrently": "^8.0.1",
+    "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
-    "electron": "^24.3.1",
+    "electron": "^29.0.1",
     "electron-reload": "^2.0.0-alpha.1",
     "postcss": "^8.4.23",
-    "svelte": "^3.57.0",
+    "sass": "^1.71.1",
+    "svelte": "^4.2.12",
     "tailwindcss": "^3.3.2",
     "vite": "^4.3.2"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "@electron-toolkit/utils": "^3.0.0",
+    "@milkdown/core": "^7.3.5",
+    "@milkdown/ctx": "^7.3.5",
+    "@milkdown/plugin-cursor": "^7.3.5",
+    "@milkdown/plugin-history": "^7.3.5",
+    "@milkdown/plugin-slash": "^7.3.5",
+    "@milkdown/plugin-trailing": "^7.3.5",
+    "@milkdown/preset-commonmark": "^7.3.5",
+    "@milkdown/prose": "^7.3.5",
+    "@milkdown/theme-nord": "^7.3.5",
+    "@milkdown/transformer": "^7.3.5",
+    "@root/walk": "^1.1.0",
+    "@tailwindcss/typography": "^0.5.10",
+    "electron-squirrel-startup": "^1.0.0",
+    "svelte-splitpanes": "^0.8.0"
   }
 }
