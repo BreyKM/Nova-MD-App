@@ -1,8 +1,19 @@
 nav {
-    border: 1px solid red;
-    height: 60px;
-}
-
-:not(nav) {
+    height: 40px;
     -webkit-app-region: drag;
 }
+
+nav *:not(div) {
+    -webkit-app-region: no-drag;
+}
+
+.titlebar-buttons {
+    color: #fafafa;
+}
+
+.titlebar {
+    height: 100%;
+}
+
+
+

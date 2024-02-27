@@ -4,11 +4,15 @@
 
 @layer base {
   body {
-    @apply bg-black;
+    @apply bg-black-900;
     @apply font-jost;
   }
 
   h1 {
     @apply text-3xl;
   }
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
