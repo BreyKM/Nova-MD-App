@@ -2,8 +2,8 @@
   import "./Nav.css";
 </script>
 
-<div class="nav-container">
-  <nav>
+<div class="nav-container fixed z-10 top-0 w-full overflow-hidden">
+  <nav class= 'w-full'>
     <div class="titlebar flex justify-between bg-nav-gray" >
       <div class="titlebar-title text-[1.75rem] px-3 text-bone">Nova</div>
       <div class="titlebar-buttons flex items-center colors-white">

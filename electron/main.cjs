@@ -55,9 +55,8 @@ const createWindow = () => {
     height: 800,
     autoHideMenuBar: true,
     center: true,
-    alwaysOnTop: true,
-    backgroundColor: '#1F1F1F',
-    title: 'Nova',
+    backgroundColor: "#1F1F1F",
+    title: "Nova",
     frame: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -88,9 +87,9 @@ const createWindow = () => {
 
   ipcMain.on("maximize", () => {
     if (maximizeToggle) {
-        mainWindow.unmaximize();
+      mainWindow.unmaximize();
     } else {
-        mainWindow.maximize();
+      mainWindow.maximize();
     }
     maximizeToggle = !maximizeToggle;
     console.log(maximizeToggle);

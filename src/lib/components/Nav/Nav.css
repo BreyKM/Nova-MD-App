@@ -1,6 +1,9 @@
-nav {
+
+
+.nav-container {
     height: 40px;
     -webkit-app-region: drag;
+    top: 0;
 }
 
 nav *:not(div) {
@@ -13,6 +16,7 @@ nav *:not(div) {
 
 .titlebar {
     height: 100%;
+    z-index: 999;
 }
 
 

@@ -1,28 +1,16 @@
-#content-container {
+.tiptap p.is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .editor-container {
+    overflow-y: auto;
     height: 100vh;
-}
+  }
 
-.milkdown, .editor{
-    margin: 2rem;
-    overflow: hidden;
-}
-
-.editor {
-    color: #F9F6EE;
-    font-size: 1rem;    
-}
-
-.milkdown, .editor{
-    height: inherit;
-    border: none;
-}
-
-
-
-.ProseMirror:focus-visible {
-    outline: none;
-}
-
-.ProseMirror:focus {
-    border: 2px solid rgba(25, 25, 25, 0.5);
-}
+  .ProseMirror {
+    top: 40px;
+  }

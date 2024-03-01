@@ -3,16 +3,29 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    overflow: hidden;
+  }
+
   body {
     @apply bg-black-900;
     @apply font-jost;
+    overflow: hidden;
   }
 
   h1 {
     @apply text-3xl;
   }
-}
 
-::-webkit-scrollbar {
-  display: none;
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-[#555] rounded-md;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
 }

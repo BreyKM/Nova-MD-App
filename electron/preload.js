@@ -9,7 +9,9 @@ const api = {
 contextBridge.exposeInMainWorld('electronAPI', {
     minimize: () => ipcRenderer.send('minimize'),
     maximize: () => ipcRenderer.send('maximize'),
-    close: () => ipcRenderer.send('close')
+    close: () => ipcRenderer.send('close'),
+    locale: navigator.language
 })
+
 
 contextBridge.exposeInMainWorld('api', api)
