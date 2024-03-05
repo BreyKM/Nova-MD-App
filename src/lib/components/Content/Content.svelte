@@ -1,42 +1,63 @@
 <script>
-  // import { Editor, rootCtx, defaultValueCtx } from "@milkdown/core";
-  import { commonmark } from "@milkdown/preset-commonmark";
-  import { nord } from "@milkdown/theme-nord";
   import "@milkdown/theme-nord/style.css";
   import "./Content.css";
-  import { history } from "@milkdown/plugin-history";
-  import { cursor } from "@milkdown/plugin-cursor";
-  import { trailing } from "@milkdown/plugin-trailing";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, onDestroy, afterUpdate } from "svelte";
   import { Editor } from "@tiptap/core";
   import StarterKit from "@tiptap/starter-kit";
-  import placeholder from "@tiptap/extension-placeholder";
+  import Document from "@tiptap/extension-document";
+  import Placeholder from "@tiptap/extension-placeholder";
   import FloatingNoteTitle from "../../components/FloatingNoteTitle.svelte";
   import { useMarkdownEditor } from "../../../hooks/useMarkdownEditor";
-  import { selectedNoteStore } from "../../../store/Store";
+  import {
+    selectedNoteStore,
+    selectedNoteWithContentStore,
+    editorStore
+  } from "../../../store/Store";
 
   let noteContent;
-  $: if (!$selectedNoteStore) {
-    console.log("No note selected");
+  $: if (!$selectedNoteWithContentStore) {
+    // console.log("No note selected");
   } else {
-    console.log($selectedNoteStore.content);
-    noteContent = $selectedNoteStore.content;
+    // console.log($selectedNoteWithContentStore.content);
+    noteContent = $selectedNoteWithContentStore.content;
+    // console.log(noteContent);
   }
-
+  let unsubscribe;
   let element;
   let editor;
 
+  const { handleAutoSaving, getNewNotecontent } = useMarkdownEditor();
+
+  const CustomDocument = Document.extend({
+    content: "heading block*",
+  });
+
+  const notePromise = new Promise(resolve => {
+  const unsubscribe = selectedNoteStore.subscribe(note => {
+    resolve(note);
+  });
+});
+
   onMount(() => {
+    // console.log("selectedNoteStore", $selectedNoteStore);
     editor = new Editor({
       element: element,
       extensions: [
-        StarterKit,
-        placeholder.configure({
-          placeholder: "Start typing...",
+        CustomDocument,
+        StarterKit.configure({
+          document: false,
+        }),
+        Placeholder.configure({
+          placeholder: ({ node }) => {
+            if (node.type.name === "heading") {
+              return "What’s the title?";
+            }
+
+            return "Can you add some further context?";
+          },
         }),
       ],
-      content: $selectedNoteStore ? $selectedNoteStore.content : '',
-      
+      content: $selectedNoteStore ? `<h1>${$selectedNoteStore.title}</h1>` : "",
       editorProps: {
         attributes: {
           class:
@@ -49,15 +70,36 @@
       onTransaction: () => {
         editor = editor;
       },
+
+      onUpdate: () => {
+        handleAutoSaving(editor.getJSON());
+        console.log("editor.getJSON()", editor.getJSON());
+      },
+      
     });
-    unsubscribe = selectedNoteStore.subscribe(note => {
-      if (note) {
-        editor.commands.setContent(note.content);
-      } else {
-        editor.commands.setContent('');
-      }
+    editorStore.set(editor)
+    getNewNotecontent(editor.getJSON());
+    // selectedNoteStore.subscribe((note) => {
+    //   if (note) {
+    //     editor.commands.setContent(note.content);
+    //     console.log("note.content", note.content);
+    //     console.log("note.content", $selectedNoteStore);
+    //   } else {
+    //     editor.commands.setContent(note.title);
+    //   }
+    // });
   });
-});
+
+  afterUpdate(() => {
+    if (editor && $selectedNoteWithContentStore) {
+      if ($selectedNoteWithContentStore) {
+      editor.commands.setContent($selectedNoteWithContentStore.content);
+      console.log("note.content", $selectedNoteWithContentStore.content);
+    } else {
+      editor.commands.setContent($selectedNoteWithContentStore.title);
+    }
+    }
+  });
 
   // $: {
   // if (editor && $selectedNote && editor.getText() != $selectedNote.content) {
@@ -75,18 +117,15 @@
     }
   });
 
-
   // let isUpdating = false;
 
-  
-    // if (
-    //   editor &&
-    //   $selectedNoteStore
-    // ) {
-    //   editor.commands.setContent($selectedNoteStore.content);
-    //   console.log("noteText");
-    // }
-  
+  // if (
+  //   editor &&
+  //   $selectedNoteStore
+  // ) {
+  //   editor.commands.setContent($selectedNoteStore.content);
+  //   console.log("noteText");
+  // }
 
   // $: if (
   //   editor &&

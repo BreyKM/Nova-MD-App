@@ -1,8 +1,13 @@
 import { notesStore, selectedNoteIndexStore } from "../store/Store";
 
-let selectedNoteIndex
+
 export const useNotesList = ({ onSelect }) => {
-    const notes = notesStore
+    let notes;
+    notesStore.subscribe(value => {
+        notes = value;
+        // console.log(notes)
+      });
+    
 
     
     const handleNotesSelect = (index) => async() => {
@@ -12,6 +17,7 @@ export const useNotesList = ({ onSelect }) => {
 
         if(onSelect) {
             onSelect()
+            // console.log('onSelect')
         }
     }
 
