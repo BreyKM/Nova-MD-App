@@ -1,0 +1,39 @@
+.splitpanes.starter-theme {
+  .splitpanes__pane {
+    background-color: inherit;
+    
+  }
+
+    .main-pane {
+      position: relative;
+      z-index: 0;
+    }
+
+  
+    .recent-folder-pane {
+      z-index: 99;
+    }
+  
+
+  .splitpanes__splitter {
+    background-color: #cccccc49;
+    box-sizing: border-box;
+    position: relative;
+    &:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      transition: opacity 0.4s;
+      background-color: rgba(25, 25, 25, 0.3);
+      opacity: 0;
+      z-index: 1;
+    }
+    &:hover:before {
+      opacity: 1;
+    }
+    &.splitpanes__splitter__active {
+      z-index: 2; /* Fix an issue of overlap fighting with a near hovered splitter */
+    }
+  }
+}

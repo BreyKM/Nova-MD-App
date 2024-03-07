@@ -3,14 +3,27 @@
 @tailwind utilities;
 
 @layer base {
+
+  :root {
+    --color-text-base: #fafafa;
+    --color-text-muted: #fafafab7;
+    --color-text-inverted: #000000; //placeholder
+    --color-fill: #fafafa; //placeholder
+    --color-button-accent: #fafafa; //placeholder
+    --color-button-accent-hover: #fafafa; //placeholder
+    --color-button-muted: #fafafa; //placeholder
+  }
+
   html {
     overflow: hidden;
+    height: 100%;
   }
 
   body {
     @apply bg-black-900;
     @apply font-jost;
     overflow: hidden;
+    height: 100%;
   }
 
   h1 {

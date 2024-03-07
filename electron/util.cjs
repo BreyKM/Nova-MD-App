@@ -1,11 +1,8 @@
-const { ensureDir, readdir, readJSON, readJSONSync } = require("fs-extra");
+const { ensureDir, readdir, readJSON, writeFile, stat } = require("fs-extra");
 const { appDirectoryName, fileEncoding } = require("../shared/constants.cjs");
-const { homedir } = require("os");
-const { stat } = require("fs-extra");
-const { readFile, writeFile } = require("fs-extra");
 const { dialog } = require("electron");
 const { ipcMain } = require("electron");
-let { NotesFolderName } = require('./main.cjs');
+let { NotesFolderName, NewNoteBookDirName, newNotebookDirNameInputMain } = require('./main.cjs');
 
 
 
@@ -24,10 +21,37 @@ module.exports.handleFolderSelection = async () => {
   return NotesFolderName;
 };
 
+module.exports.newNotebookDirSelection = async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ["openDirectory"],
+  });
+
+  if (!result.canceled) {
+    NewNoteBookDirName = result.filePaths[0];
+  } else {
+    NewNoteBookDirName = result.filePaths[0];
+  }
+
+  return NewNoteBookDirName;
+}
+
+
+
 const getRootDir = () => {
     console.log("getRootDir: ", NotesFolderName);
   return `${NotesFolderName}`;
 };
+
+module.exports.createNewNotebookDir = async (input) => {
+  const path = `${NewNoteBookDirName}/${input}`
+  console.log("createNewNotebookDir: ", path);
+  await ensureDir(path, function(err) {
+    if (err) {
+      console.log("Error in creating directory: ", err);
+    }
+    console.log("Directory created successfully");
+  });
+}
 
 module.exports.getNotes = async () => {
   const rootDir = getRootDir();

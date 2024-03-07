@@ -1,22 +1,7 @@
 import { get, writable, derived } from "svelte/store";
 import { notesMock } from "./mocks";
 
-// async function loadNotes() {
-//   const notes = await window.electronAPI.getNotes();
-//   console.log("notes:", notes.length);
-//   if (notes.length === 0) {
-//     return notesStore.set(notesMock);
-//   } else {
-//     //sort by lastEditTime
-//     const sortedNotes = notes.sort((a, b) => b.lastEditTime - a.lastEditTime);
-//     notesStore.set(sortedNotes);
-//   }
-// }
-// export const notesStore = writable(loadNotes(), []);
 
-// notesStore.subscribe((value) => {
-//   console.log("notesStore value:", value);
-// });
 
 export const notesStore = writable(null);
 export const editorStore = writable(null);
@@ -35,20 +20,7 @@ async function loadNotes() {
 // Call loadNotes after the store is defined
 loadNotes();
 
-// notesStore.subscribe((value) => {
-//   console.log("notesStore value:", value);
-// });
 
-// const initialNotesStore = [];
-// const noteStoreAsync = writable(initialNotesStore);
-
-// loadNotes().then(notes => {
-//   notesStoreAsync.set(notes)
-// })
-
-// export const notesStoreAsync = derived(notesStoreAsync, $notes => $notes)
-
-// export const notesStore =
 
 export const selectedNoteIndexStore = writable(null);
 
@@ -148,7 +120,7 @@ export function createEmptyNote() {
   selectedNoteIndexStore.set(0);
 }
 
-export function deleteNote() {
+export function openDirectory() {
   window.electronAPI.openFolder();
   window.electronAPI.getFolderName();
 
@@ -158,27 +130,23 @@ export function deleteNote() {
   });
 }
 
-// export const saveNoteStore = writable(null, (get, set, newContent) => {
-//   const notes = get(notesStore);
-//   const selectedNote = get(selectedNoteStore);
+export const newNotebookDirNameStore = writable(null);
 
-//   if (!selectedNote || !notes) return;
+export const newNotebookDirNameInputStore = writable(null);
 
-//   window.electronAPI.writeNote(selectedNote.title, newContent);
+export async function NewNotebookDir() {
+  window.starter.newNotebookDir()
+  let newNotebookDirName = await window.starter.getNewNotebookDirName();
+  newNotebookDirNameStore.set(newNotebookDirName);
+  console.log("newNotebookDirNameStore:", get(newNotebookDirNameStore));
 
-//   console.log(newContent);
+}
 
-//   const updatedNote = {
-//     ...selectedNote,
-//     lastEditTime: Date.now(),
-//   };
+export async function createNewNotebookDir() {
+  window.starter.createNewNotebookDir(get(newNotebookDirNameInputStore));
+  console.log("createNewNotebookDirClicked");
+  window.starter.closeStarterWin();
 
-//   set(
-//     notesStore,
-//     notes.map((note) => {
-//       note.title === selectedNote.title ? updatedNote : note;
-//     })
-//   );
 
-//   set(selectedNoteIndexStore, 0);
-// });
+  
+}

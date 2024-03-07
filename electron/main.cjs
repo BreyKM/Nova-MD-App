@@ -3,6 +3,8 @@ const {
   readNote,
   writeNote,
   handleFolderSelection,
+  newNotebookDirSelection,
+  createNewNotebookDir,
 } = require("./util.cjs");
 
 // Modules to control application life and create native browser window
@@ -11,7 +13,9 @@ const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const { electronApp, optimizer } = require("@electron-toolkit/utils");
 const fs = require("fs");
+const ElectronStore = require("./electron-store.cjs");
 
+const ElectronStoreRef = new ElectronStore();
 
 // const Walk = require("@root/walk");
 
@@ -56,7 +60,10 @@ if (isDevEnvironment) {
 }
 
 let mainWindow;
+let starterWindow;
 let NotesFolderName;
+let NewNotebookDirName;
+let newNotebookDirNameInputMain;
 
 const createWindow = () => {
   // Create the browser window.
@@ -65,6 +72,7 @@ const createWindow = () => {
     height: 800,
     autoHideMenuBar: true,
     center: true,
+    show: false,
     backgroundColor: "#1F1F1F",
     title: "Nova",
     frame: false,
@@ -75,19 +83,39 @@ const createWindow = () => {
     },
   });
 
-  mainWindow.on("ready-to-show", () => {
-    mainWindow.show();
+  starterWindow = new BrowserWindow({
+    width: 800,
+    height: 650,
+    autoHideMenuBar: true,
+    center: true,
+    show: false,
+    backgroundColor: "#1F1F1F",
+    title: "Nova Starter Page",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.cjs"),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
   });
 
   // define how electron will load the app
   if (isDevEnvironment) {
     // if your vite app is running on a different port, change it here
-    mainWindow.loadURL("http://localhost:5173/");
+    mainWindow.loadURL("http://localhost:5173/index");
+    starterWindow.loadURL("http://localhost:5173/starter");
     log("Electron running in dev mode: 🧪");
   } else {
     // when not in dev mode, load the build file instead
     mainWindow.loadFile(path.join(__dirname, "build", "index.html"));
     log("Electron running in prod mode: 🚀");
+  }
+
+  if (!ElectronStoreRef.get("ActiveFolder")) {
+    starterWindow.show();
+    mainWindow.show();
+  } else {
+    starterWindow.show();
+    mainWindow.show();
   }
 
   let maximizeToggle = false;
@@ -106,6 +134,7 @@ const createWindow = () => {
   });
 
   ipcMain.on("close", () => {
+    ElectronStoreRef.save();
     app.quit();
   });
 };
@@ -129,10 +158,31 @@ app.whenReady().then(() => {
   ipcMain.on("openFolder", (event) => {
     handleFolderSelection().then((result) => {
       NotesFolderName = result;
-      console.log("mainProcessFolderName: ", NotesFolderName)
+      ElectronStoreRef.set("ActiveFolder", NotesFolderName);
+      console.log("mainProcessFolderName: ", NotesFolderName);
       event.reply("folderSelected", NotesFolderName);
     });
   });
+
+  //starter page functions
+
+  ipcMain.handle("createNewNotebookDir", (_, ...args) =>
+    createNewNotebookDir(...args)
+  );
+
+  ipcMain.on("newNotebookDir", (event) => {
+    newNotebookDirSelection().then((result) => {
+      NewNotebookDirName = result;
+      console.log("mainNewNoteBookDirName: ", NewNotebookDirName);
+      event.reply("newNotebookDirSelected", NewNotebookDirName);
+    });
+  });
+
+  ipcMain.on("closeStarterWin", () => {
+    starterWindow.close();
+    mainWindow.show();
+  });
+
   app.on("activate", () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.

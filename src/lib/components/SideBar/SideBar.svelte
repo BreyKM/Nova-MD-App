@@ -5,7 +5,7 @@
   //   deleteNoteStore,
   // } from "../../../store/Store.js";
 
-  import { createEmptyNote, deleteNote } from "../../../store/Store.js";
+  import { createEmptyNote, openDirectory } from "../../../store/Store.js";
 
   
 
@@ -36,7 +36,7 @@
   </div>
   <div class="btn-container h-[24px] p-2 hover:bg-gray-700 box-content">
     <BtnSideBar
-    handleClick={deleteNote}
+    handleClick={openDirectory}
       class="sidebar-btn"
       width="1.5rem"
       height="1.5rem"
