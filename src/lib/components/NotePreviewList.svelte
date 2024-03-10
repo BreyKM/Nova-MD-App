@@ -4,20 +4,33 @@
   import { useNotesList } from "../../hooks/useNotesList";
   import { selectedNoteIndexStore, notesStore } from "../../store/Store";
   import { isEmpty } from "lodash";
+  import { onMount, beforeUpdate, afterUpdate } from "svelte";
   export let onSelect;
-
 
   const { handleNotesSelect } = useNotesList({
     onSelect,
   });
-    let isLoading = true;
+  let isLoading = true;
 
   // Reactive statement that watches the notes variable
 
+  $: $notesStore, (isLoading = false);
+  $: console.log("notePreviewList NotesStore: ", $notesStore);
 
-  $: $notesStore, isLoading = false;
-  $: console.log('notePreviewList NotesStore: ', $notesStore);
+  async function loadNotes() {
+    const notes = await window.electronAPI.getNotes();
+    console.log("notes:", notes);
+    //sort by lastEditTime
+    const sortedNotes = notes.sort((a, b) => b.lastEditTime - a.lastEditTime);
+    // console.log("Notes:", notes);
+    console.log("sortedNotes:", sortedNotes);
+    notesStore.set(sortedNotes);
+    console.log("notesStore:", get(notesStore));
+  }
 
+  onMount(() => {
+    loadNotes();
+  });
 </script>
 
 <div class="note-preview-list-container">
@@ -47,6 +60,6 @@
 <style>
   .note-preview-list-container {
     overflow-y: auto;
-    height: calc(100vh - 90px);
+    height: calc(100vh - 8rem);
   }
 </style>

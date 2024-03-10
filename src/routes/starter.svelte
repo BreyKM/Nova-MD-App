@@ -4,13 +4,17 @@
   import { Button, Input } from "svelte-ux";
   import { openDirectory } from "../store/Store.js";
   import "../lib/css/starter.scss";
-  import { NewNotebookDir, newNotebookDirNameStore, createNewNotebookDir, newNotebookDirNameInputStore } from '../store/Store.js'
+  import {
+    NewNotebookDir,
+    newNotebookDirNameStore,
+    createNewNotebookDir,
+    newNotebookDirNameInputStore,
+  } from "../store/Store.js";
 
-  $: console.log($newNotebookDirNameStore)
+  $: console.log($newNotebookDirNameStore);
 
-  let newNotebookDirNameInput = '';
-  $: newNotebookDirNameInputStore.set(newNotebookDirNameInput)
-
+  let newNotebookDirNameInput = "";
+  $: newNotebookDirNameInputStore.set(newNotebookDirNameInput);
 
   let slideInRight = false;
   let slideOutRight = false;
@@ -20,10 +24,11 @@
   let slideContainerOne = null;
   let slideContainerTwo = null;
 
+  let inputEmpty = false;
+
   function createBtnSlide() {
     slideInRight = !slideInRight;
     slideOutLeft = !slideOutLeft;
-    
   }
 
   function backBtnSlide() {
@@ -35,6 +40,10 @@
       slideOutRight = !slideOutRight;
       slideInLeft = !slideInLeft;
     }, 500);
+  }
+
+  function isInputEmpty(newNotebookDirNameInput) {
+    return newNotebookDirNameInput == "";
   }
 </script>
 
@@ -119,30 +128,43 @@
               <p>pick a name for your Notebook.</p>
             </div>
             <div class="notebook-name-input-container">
-              <input
-              bind:value={newNotebookDirNameInput}
-                class="notebook-name-input"
-                type="text"
-                placeholder="Notebook name"
-                minlength="1"
-              />
+              <form on:submit={createNewNotebookDir} id="NotebookDirName-input">
+                <input
+                  required
+                  bind:value={newNotebookDirNameInput}
+                  class="notebook-name-input"
+                  type="text"
+                  placeholder="Notebook name"
+                  minlength="1"
+                />
+              </form>
             </div>
           </div>
           <div class="create-notebook-container flex justify-between mx-10">
             <div class="create-notebook-info mr-10">
               <p class="text-lg">Location</p>
               <p class="text-xs text-gray-400">
-                {#if ($newNotebookDirNameStore)}
-                Your new notebook will be created in: 
-                <span class="text-purple-400">{$newNotebookDirNameStore}</span>
+                {#if $newNotebookDirNameStore}
+                  Your new notebook will be created in:
+                  <span class="text-purple-400">{$newNotebookDirNameStore}</span
+                  >
                 {:else}
-                pick a place to put your new notebook.
+                  pick a place to put your new notebook.
                 {/if}
               </p>
             </div>
-            <button on:click={NewNotebookDir} class="h-8 bg-red-500 px-5 rounded">Browse</button>
+            <button
+              on:click={NewNotebookDir}
+              class="h-8 bg-red-500 px-5 rounded">Browse</button
+            >
           </div>
-          <button on:click={createNewNotebookDir} class="createNewNotebook-btn h-8 bg-red-500 px-5 mt-10 rounded w-32 self-center">Create</button>
+          <button
+          
+            form="NotebookDirName-input" type='submit'
+            
+            class="createNewNotebook-btn h-8 bg-red-500 px-5 mt-10 rounded w-32 self-center"
+            >Create</button
+          >
         </div>
       </div>
     </Pane>

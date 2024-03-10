@@ -1,7 +1,6 @@
 import { get, writable, derived } from "svelte/store";
 import { notesMock } from "./mocks";
-
-
+import { load } from "../../.routify/components/[...404].svelte";
 
 export const notesStore = writable(null);
 export const editorStore = writable(null);
@@ -18,8 +17,6 @@ async function loadNotes() {
 }
 
 // Call loadNotes after the store is defined
-loadNotes();
-
 
 
 export const selectedNoteIndexStore = writable(null);
@@ -69,10 +66,42 @@ export const selectedNoteWithContentStore = derived(
 
 export const newNoteContentStore = writable(null);
 
-export function createEmptyNote() {
-  const notes = get(notesStore);
+export const NewNotebookNoteContentStore = writable(null);
+
+export async function NewNotebookNote() {
+  const title = `Welcome`;
+  NewNotebookNoteContentStore.set(`{
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 1
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "${title}"
+          }
+        ]
+      }
+    ]
+  }`);
+  const NewNotebookNoteContent = get(NewNotebookNoteContentStore);
+
+  await window.electronAPI.writeNote(title, NewNotebookNoteContent);
+  console.log("note Written");
+}
+
+export async function createEmptyNote() {
+  let notes = await get(notesStore);
+  console.log("notes:", notes);
+  if (!notes) {
+    await loadNotes();
+    notes = await get(notesStore);
+  }
   const title = `Untitled ${notes.length + 1}`;
-  console.log(notes.length)
+  console.log(notes.length);
   const editor = get(editorStore);
   console.log("editor:", editor);
   newNoteContentStore.set(`{
@@ -135,18 +164,21 @@ export const newNotebookDirNameStore = writable(null);
 export const newNotebookDirNameInputStore = writable(null);
 
 export async function NewNotebookDir() {
-  window.starter.newNotebookDir()
+  window.starter.newNotebookDir();
   let newNotebookDirName = await window.starter.getNewNotebookDirName();
   newNotebookDirNameStore.set(newNotebookDirName);
   console.log("newNotebookDirNameStore:", get(newNotebookDirNameStore));
-
 }
 
-export async function createNewNotebookDir() {
-  window.starter.createNewNotebookDir(get(newNotebookDirNameInputStore));
-  console.log("createNewNotebookDirClicked");
-  window.starter.closeStarterWin();
-
-
+export const createNewNotebookDir = async (e) => {
+  e.preventDefault();
+  await window.starter.createNewNotebookDir(get(newNotebookDirNameInputStore));
   
-}
+  await NewNotebookNote();
+  await window.starter.loadNotesInMainWin()
+  console.log("please work");
+  await window.starter.activeFolderSet();
+  await window.starter.closeStarterWin();
+  await window.starter.loadNotesInMainWin();
+};
+

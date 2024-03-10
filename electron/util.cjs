@@ -2,7 +2,7 @@ const { ensureDir, readdir, readJSON, writeFile, stat } = require("fs-extra");
 const { appDirectoryName, fileEncoding } = require("../shared/constants.cjs");
 const { dialog } = require("electron");
 const { ipcMain } = require("electron");
-let { NotesFolderName, NewNoteBookDirName, newNotebookDirNameInputMain } = require('./main.cjs');
+let { NotesFolderName, NewNoteBookDirName, newNotebookDirNameInputMain, NewNotebookDirPathMain, activeFolderPath } = require('./main.cjs');
 
 
 
@@ -35,28 +35,53 @@ module.exports.newNotebookDirSelection = async () => {
   return NewNoteBookDirName;
 }
 
+module.exports.updateNewNotebookDirPathMain = async (newPath) => {
+  NewNotebookDirPathMain = await Promise.resolve(newPath);
+}
+
+module.exports.updateActiveFolderPath = async (newPath) => {
+  activeFolderPath = await Promise.resolve(newPath);
+}
 
 
 const getRootDir = () => {
-    console.log("getRootDir: ", NotesFolderName);
-  return `${NotesFolderName}`;
-};
+  if (!activeFolderPath) {
+    return
+  } else {
+  if (Object.keys(activeFolderPath).length == 0 || !activeFolderPath) {
+    console.log("getRootDir: ", NewNotebookDirPathMain);
+    return `${NewNotebookDirPathMain}`;
+  } else {
+    console.log("getRootDir: ", activeFolderPath);
+    return `${activeFolderPath}`;
+};  
+  }
+  
+}
 
 module.exports.createNewNotebookDir = async (input) => {
-  const path = `${NewNoteBookDirName}/${input}`
+  if (input === '') {
+    console.log("input is null");
+  } else {
+    const path = `${NewNoteBookDirName}\\${input}`
   console.log("createNewNotebookDir: ", path);
-  await ensureDir(path, function(err) {
+   ensureDir(path, function(err) {
     if (err) {
       console.log("Error in creating directory: ", err);
     }
     console.log("Directory created successfully");
-  });
+  }); 
+  return Promise.resolve(path);
+  }
+ 
 }
 
 module.exports.getNotes = async () => {
   const rootDir = getRootDir();
+  console.log("getNotes RootDir: ", rootDir);
 
   await ensureDir(rootDir);
+  console.log("rootDir: ", rootDir);
 
   const notesFileNames = await readdir(rootDir, {
     encoding: fileEncoding,
@@ -64,6 +89,7 @@ module.exports.getNotes = async () => {
   });
 
   const notes = notesFileNames.filter((filename) => filename.endsWith(".json"));
+  console.log("notes: ", notes);
 
   return Promise.all(notes.map(getNoteInfoFromFilename));
 };

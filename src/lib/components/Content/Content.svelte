@@ -1,5 +1,4 @@
 <script>
-  import "@milkdown/theme-nord/style.css";
   import "./Content.css";
   import { onMount, onDestroy, afterUpdate } from "svelte";
   import { Editor } from "@tiptap/core";
@@ -140,5 +139,3 @@
   <FloatingNoteTitle />
 </div>
 
-<style>
-</style>

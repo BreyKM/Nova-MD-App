@@ -12,7 +12,7 @@ const { log } = require("console");
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const { electronApp, optimizer } = require("@electron-toolkit/utils");
-const fs = require("fs");
+const fse = require("fs-extra");
 const ElectronStore = require("./electron-store.cjs");
 
 const ElectronStoreRef = new ElectronStore();
@@ -64,6 +64,7 @@ let starterWindow;
 let NotesFolderName;
 let NewNotebookDirName;
 let newNotebookDirNameInputMain;
+let NewNotebookDirPath;
 
 const createWindow = () => {
   // Create the browser window.
@@ -110,13 +111,36 @@ const createWindow = () => {
     log("Electron running in prod mode: 🚀");
   }
 
-  if (!ElectronStoreRef.get("ActiveFolder")) {
-    starterWindow.show();
-    mainWindow.show();
+  let activeFolderPath;
+
+  if (ElectronStoreRef.get("ActiveFolder") != undefined) {
+    fse.access(ElectronStoreRef.get("ActiveFolder"), (error) => {
+      if (!error && ElectronStoreRef.get("ActiveFolder") != {}) {
+        mainWindow.show();
+        activeFolderPath = ElectronStoreRef.get("ActiveFolder")
+        require("./util.cjs").updateActiveFolderPath(activeFolderPath);
+        if (app.isReady()) {
+          mainWindow.webContents.send("loadNotesFromActiveFolder");
+        console.log("Folder exists");
+        }
+      } else {
+        starterWindow.show();
+        console.log("Folder does not exist");
+        console.log("ActiveFolder: ", ElectronStoreRef.get("ActiveFolder"));
+        ElectronStoreRef.delete("ActiveFolder");
+        console.log("ActiveFolder: ", ElectronStoreRef.get("ActiveFolder"));
+      }
+    });
   } else {
     starterWindow.show();
-    mainWindow.show();
   }
+
+  // if (ElectronStoreRef.get("ActiveFolder") === undefined) {
+  //   starterWindow.show();
+  // } else {
+  //   mainWindow.show();
+  //   console.log("ActiveFolder: ", ElectronStoreRef.get("ActiveFolder"));
+  // }
 
   let maximizeToggle = false;
   ipcMain.on("minimize", () => {
@@ -134,7 +158,6 @@ const createWindow = () => {
   });
 
   ipcMain.on("close", () => {
-    ElectronStoreRef.save();
     app.quit();
   });
 };
@@ -166,9 +189,12 @@ app.whenReady().then(() => {
 
   //starter page functions
 
-  ipcMain.handle("createNewNotebookDir", (_, ...args) =>
-    createNewNotebookDir(...args)
-  );
+  ipcMain.handle("createNewNotebookDir", async (_, ...args) => {
+    NewNotebookDirPath = createNewNotebookDir(...args);
+    console.log("path: ", await NewNotebookDirPath);
+    require("./util.cjs").updateNewNotebookDirPathMain(NewNotebookDirPath);
+    return NewNotebookDirPath;
+  });
 
   ipcMain.on("newNotebookDir", (event) => {
     newNotebookDirSelection().then((result) => {
@@ -179,8 +205,26 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on("closeStarterWin", () => {
-    starterWindow.close();
     mainWindow.show();
+    starterWindow.close();
+  });
+
+  ipcMain.on("activeFolderSet", async () => {
+    ElectronStoreRef.set(
+      "ActiveFolder",
+      await Promise.resolve(NewNotebookDirPath)
+    );
+    console.log("ActiveFolder: ", ElectronStoreRef.get("ActiveFolder"));
+  });
+
+  ipcMain.on("loadNewDir", () => {
+    getNotes();
+  });
+
+  ipcMain.on("loadNotesInMainWin", () => {
+    // Send a message to the mainWindow to load notes
+    mainWindow.webContents.send("loadNotesMain");
+    console.log("loadNotesInMainWin");
   });
 
   app.on("activate", () => {
@@ -197,15 +241,4 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
 
-// async function handleFolderSelection() {
-//   const result = await dialog.showOpenDialog({
-//     properties: ['openDirectory']
-//   });
-
-//   if (!result.canceled) {
-//     const selectedFolderPath = result.filePaths[0];
-//   }
-// }
